@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/addscholar.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarAid - Create New Scholarship</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
+                <h1>ScholarAid</h1>
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About</a></li> 
+
+                    {% if user.is_authenticated %}
+
+                        {# STUDENT ROLE #}
+                        {% if user.role == "student" %}
+                            <li><a href="{% url 'registered_scholarships' %}">My Scholarship</a></li>
+                            <li><a href="{% url 'my_sponsors' %}">My Sponsor</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">Review</a></li>
+                            <li>
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
+                                    style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
+                            </li>
+
+                        {# SPONSOR ROLE #}
+                        {% elif user.role == "sponsor" %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'ourscholar' %}" class="active">Our Scholarships</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">View Reviews</a></li>
+
+                        {# ADMIN ROLE #}
+                        {% elif user.is_superuser %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'sponlist' %}">Sponsors</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">All Reviews</a></li>
+                        {% endif %}
+
+                        <li><a href="{% url 'logout_view' %}">Logout</a></li>
+
+                    {% else %}
+                        <li><a href="{% url 'studreg' %}">Student Register</a></li>
+                        <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
+                        <li><a href="{% url 'login_view' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="form-header">
+            <div class="container">
+                <h1>Create New Scholarship</h1>
+                <p>Fill out the form below to create a new scholarship opportunity</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <div class="form-container">
+                <div class="step-indicator">
+                    <div class="step active">1</div>
+                    <div class="step">2</div>
+                    <div class="step">3</div>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" id="step1">
+                        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Basic Information</h2>
+                        
+                        <div class="form-group">
+                            <label for="scholarship-name">Scholarship Name *</label>
+                            <input type="text" id="scholarship-name" name="name" required placeholder="e.g. Academic Excellence Scholarship">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="amount">Scholarship Amount *</label>
+                                    <input type="number" id="amount" name="amount" required placeholder="e.g. 5000">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="deadline">Application Deadline *</label>
+                                    <input type="date" id="deadline" name="deadline" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="scholarship-type">Scholarship Type *</label>
+                            <select id="scholarship-type" name="scholarship_type" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="money">Money Based</option>
+                                <option value="materials">Study Materials</option>
+                                <option value="books">Books</option>
+                                <option value="uniform">Uniform/Dress</option>
+                                <option value="mixed">Mixed Support</option>
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="description">Brief Description *</label>
+                            <textarea id="description" name="description" required placeholder="Describe the purpose and benefits of this scholarship"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <div></div> <!-- Empty div for spacing -->
+                            <button type="button" class="btn btn-primary" onclick="nextStep(1, 2)">Next: Eligibility Criteria</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Eligibility Criteria -->
+                    <div class="form-step" id="step2">
+                        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Eligibility Criteria</h2>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="education-level">Education Level *</label>
+                                    <select id="education-level" name="education_level" required>
+                                        <option value="">-- Select Level --</option>
+                                        <option value="high_school">High School</option>
+                                        <option value="undergraduate">Undergraduate</option>
+                                        <option value="graduate">Graduate</option>
+                                        <option value="phd">PhD</option>
+                                        <option value="vocational">Vocational/Trade School</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="field">Field of Study</label>
+                                    <input type="text" id="field" name="field" placeholder="(Optional) Specific field of study">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="gpa">Minimum GPA Requirement</label>
+                                    <input type="number" id="gpa" name="gpa" min="0" max="4" step="0.1" placeholder="e.g. 3.0">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="financial-need">Financial Need Consideration</label>
+                                    <select id="financial-need" name="financial_need">
+                                        <option value="not_required">Not Required</option>
+                                        <option value="preferred">Preferred</option>
+                                        <option value="required">Required</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="requirements">Additional Requirements</label>
+                            <textarea id="requirements" name="requirements" placeholder="List any additional requirements (essay, letters of recommendation, etc.)"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="prevStep(2, 1)">Back</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep(2, 3)">Next: Final Details</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Final Details -->
+                    <div class="form-step" id="step3">
+                        <h2 style="margin-bottom: 20px; color: var(--primary-color);">Final Details</h2>
+                        
+                        <div class="form-group">
+                            <label for="benefits">Scholarship Benefits (Beyond Financial)</label>
+                            <textarea id="benefits" name="benefits" placeholder="Mentorship opportunities, internship offers, etc."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact">Contact Information for Applicants *</label>
+                            <input type="email" id="contact" name="contact" required placeholder="Email where applicants can send questions">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="scholarship-image">Scholarship Image</label>
+                            <input type="file" id="scholarship-image" name="image" accept="image/*">
+                            <small>Optional image to represent your scholarship (500x300 recommended)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="terms" required> I agree to the <a href="#" style="color: var(--primary-color);">Terms and Conditions</a> *
+                            </label>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="prevStep(3, 2)">Back</button>
+                            <button type="submit" class="btn btn-primary">Create Scholarship</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Copyright &copy; 2023 All Rights Reserved By ScholarAid</p>
+        </div>
+    </footer>
+
+    <script>
+        // Form step navigation
+        function nextStep(current, next) {
+            document.getElementById('step' + current).classList.remove('active');
+            document.getElementById('step' + next).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < next - 1) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index === next - 1) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+        
+        function prevStep(current, prev) {
+            document.getElementById('step' + current).classList.remove('active');
+            document.getElementById('step' + prev).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < prev - 1) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index === prev - 1) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

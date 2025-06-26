@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarAid - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
+                <h1>ScholarAid</h1>
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About</a></li> 
+
+                    {% if user.is_authenticated %}
+
+                        {# STUDENT ROLE #}
+                        {% if user.role == "student" %}
+                            <li><a href="{% url 'registered_scholarships' %}">My Scholarship</a></li>
+                            <li><a href="{% url 'my_sponsors' %}">My Sponsor</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">Review</a></li>
+                            <li>
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
+                                    style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
+                            </li>
+
+                        {# SPONSOR ROLE #}
+                        {% elif user.role == "sponsor" %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'ourscholar' %}">Our Scholarships</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">View Reviews</a></li>
+
+                        {# ADMIN ROLE #}
+                        {% elif user.is_superuser %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'sponlist' %}">Sponsors</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">All Reviews</a></li>
+                        {% endif %}
+
+                        <li><a href="{% url 'logout_view' %}">Logout</a></li>
+
+                    {% else %}
+                        <li><a href="{% url 'studreg' %}">Student Register</a></li>
+                        <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
+                        <li><a href="{% url 'login_view' %}" class="active">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="login-section">
+            <div class="login-container">
+                <h2 class="login-title">Login to Your Account</h2>
+                <form class="login-form" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="login-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">Login</button>
+                    
+                    <div class="register-link">
+                        Don't have an account? <a href="{% url 'studreg' %}">Register here</a>
+                    </div>
+                    
+                    <div class="divider">
+                        <span class="divider-text">OR</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button type="button" class="social-btn" aria-label="Login with Google">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        <button type="button" class="social-btn" aria-label="Login with Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button type="button" class="social-btn" aria-label="Login with Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Copyright &copy; 2023 All Rights Reserved By ScholarAid</p>
+        </div>
+    </footer>
+
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</body>
+</html>
