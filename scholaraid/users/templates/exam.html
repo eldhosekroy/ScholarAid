@@ -1,0 +1,410 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarAid - Take Exam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Exam Page Styles */
+        .exam-header {
+            background: linear-gradient(135deg, rgba(101,114,42,0.9) 0%, rgba(101,114,42,0.8) 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .exam-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .exam-timer {
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        .exam-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        
+        .exam-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .exam-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .exam-title {
+            font-size: 22px;
+            color: var(--primary-color);
+        }
+        
+        .exam-description {
+            color: var(--secondary-color);
+            margin: 15px 0;
+        }
+        
+        .question-card {
+            margin: 25px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .option-item:hover {
+            background: rgba(101,114,42,0.05);
+        }
+        
+        .option-radio {
+            margin-right: 15px;
+        }
+        
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+        }
+        
+        /* Results Section */
+        .results-section {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .score-display {
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+        
+        .pass-fail {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .pass {
+            color: var(--success-color);
+        }
+        
+        .fail {
+            color: var(--danger-color);
+        }
+        
+        .feedback {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: var(--secondary-color);
+        }
+        
+        .question-review {
+            text-align: left;
+            margin-top: 30px;
+        }
+        
+        .correct-answer {
+            background: rgba(40,167,69,0.1);
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .incorrect-answer {
+            background: rgba(220,53,69,0.1);
+            border-left: 3px solid var(--danger-color);
+        }
+        
+        .answer-feedback {
+            margin-top: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .answer-feedback i {
+            margin-right: 5px;
+        }
+        
+        .correct-icon {
+            color: var(--success-color);
+        }
+        
+        .incorrect-icon {
+            color: var(--danger-color);
+        }
+        
+        @media (max-width: 768px) {
+            .exam-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .score-display {
+                font-size: 48px;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
+                <h1>ScholarAid</h1>
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About</a></li> 
+
+                    {% if user.is_authenticated %}
+
+                        {# STUDENT ROLE #}
+                        {% if user.role == "student" %}
+                            <li><a href="{% url 'registered_scholarships' %}" class="active">My Scholarship</a></li>
+                            <li><a href="{% url 'my_sponsors' %}">My Sponsor</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">Review</a></li>
+                            <li>
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
+                                    style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
+                            </li>
+
+                        {# SPONSOR ROLE #}
+                        {% elif user.role == "sponsor" %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'ourscholar' %}">Our Scholarships</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">View Reviews</a></li>
+
+                        {# ADMIN ROLE #}
+                        {% elif user.is_superuser %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'sponlist' %}">Sponsors</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">All Reviews</a></li>
+                        {% endif %}
+
+                        <li><a href="{% url 'logout_view' %}">Logout</a></li>
+
+                    {% else %}
+                        <li><a href="{% url 'studreg' %}">Student Register</a></li>
+                        <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
+                        <li><a href="{% url 'login_view' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="exam-header">
+            <div class="container">
+                <h1>Scholarship Qualification Exam</h1>
+                {% if not results %}
+                <div class="exam-timer" id="exam-timer">
+                    Time Remaining: <span id="time-display">{{ exam.duration }}:00</span>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="exam-container">
+            {% if results %}
+            <!-- Results View -->
+            <div class="exam-card results-section">
+                <h2>Your Exam Results</h2>
+                <div class="score-display">{{ score }}%</div>
+                
+                {% if passed %}
+                <div class="pass-fail pass">
+                    <i class="fas fa-check-circle"></i> Congratulations! You passed!
+                </div>
+                {% else %}
+                <div class="pass-fail fail">
+                    <i class="fas fa-times-circle"></i> You didn't pass this time
+                </div>
+                {% endif %}
+                
+                <div class="feedback">
+                    {% if passed %}
+                    <p>You've scored above the passing mark of {{ exam.passing_score }}%. Your scholarship application will now be reviewed by our team.</p>
+                    {% else %}
+                    <p>The passing mark for this exam is {{ exam.passing_score }}%. You can try again after the waiting period.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="question-review">
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px;">Question Review</h3>
+                    
+                    {% for question in questions %}
+                    <div class="question-card {% if question.is_correct %}correct-answer{% else %}incorrect-answer{% endif %}">
+                        <div class="question-text">{{ question.text }}</div>
+                        {% for option in question.options %}
+                            {% if option.id == question.correct_option.id %}
+                                <div class="option-item" style="cursor: default; background: rgba(40,167,69,0.05);">
+                            {% else %}
+                                <div class="option-item" style="cursor: default;">
+                            {% endif %}
+                            <div class="option-radio">
+                                {% if option.id in selected_options %}
+                                    {% if option.is_correct %}
+                                    <i class="fas fa-check-circle correct-icon"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle incorrect-icon"></i>
+                                    {% endif %}
+                                {% else %}
+                                    {% if option.is_correct %}
+                                    <i class="far fa-check-circle correct-icon"></i>
+                                    {% else %}
+                                    <i class="far fa-circle"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div>{{ option.text }}</div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="answer-feedback">
+                            {% if question.is_correct %}
+                            <i class="fas fa-check correct-icon"></i>
+                            <span>You answered this question correctly</span>
+                            {% else %}
+                            <i class="fas fa-times incorrect-icon"></i>
+                            <span>You answered this question incorrectly</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <a href="{% url 'registered_scholarships' %}" class="btn btn-primary" style="margin-top: 30px;">
+                    <i class="fas fa-arrow-left"></i> Check Status
+                </a>
+            </div>
+            
+            {% else %}
+            <!-- Exam Form -->
+            <form class="exam-card" method="post" id="exam-form">
+                {% csrf_token %}
+                <input type="hidden" name="exam_id" value="{{ exam.id }}">
+                
+                <div class="exam-info">
+                    <div class="exam-title">{{ exam.title }}</div>
+                    <div>Passing Score: {{ exam.passing_score }}%</div>
+                </div>
+                
+                {% if exam.description %}
+                <div class="exam-description">
+                    {{ exam.description }}
+                </div>
+                {% endif %}
+                
+                {% for question in exam.questions.all %}
+                <div class="question-card">
+                    <div class="question-text">Question {{ forloop.counter }}: {{ question.text }}</div>
+                    
+                    {% for option in question.options.all %}
+                    <div class="option-item">
+                        <div class="option-radio">
+                            <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}" id="option_{{ option.id }}" required>
+                        </div>
+                        <label for="option_{{ option.id }}">{{ option.text }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn btn-primary submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Exam
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Copyright &copy; 2023 All Rights Reserved By ScholarAid</p>
+        </div>
+    </footer>
+
+    {% if not results %}
+    <script>
+        // Timer functionality
+        let duration = Number("{{ exam.duration|default:'20' }}");
+        let timeLeft = duration * 60; // Convert to seconds
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            document.getElementById('time-display').textContent = `${minutes}:${seconds}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('exam-form').submit();
+            } else {
+                timeLeft--;
+            }
+        }
+        
+        const timerInterval = setInterval(updateTimer, 1000);
+        
+        // Prevent form resubmission
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+        
+        // Warn before leaving the exam page
+        window.addEventListener('beforeunload', function(e) {
+            if (!document.getElementById('exam-form').submitted) {
+                e.preventDefault();
+                e.returnValue = 'Are you sure you want to leave? Your exam progress will be lost.';
+            }
+        });
+        
+        // Mark form as submitted when submitting
+        document.getElementById('exam-form').addEventListener('submit', function() {
+            this.submitted = true;
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

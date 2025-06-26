@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ourscholar.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarAid - My Scholarships</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
+                <h1>ScholarAid</h1>
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About</a></li> 
+
+                    {% if user.is_authenticated %}
+
+                        {# STUDENT ROLE #}
+                        {% if user.role == "student" %}
+                            <li><a href="{% url 'registered_scholarships' %}">My Scholarship</a></li>
+                            <li><a href="{% url 'my_sponsors' %}">My Sponsor</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">Review</a></li>
+                            <li>
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
+                                    style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
+                            </li>
+
+                        {# SPONSOR ROLE #}
+                        {% elif user.role == "sponsor" %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'ourscholar' %}" class="active">Our Scholarships</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">View Reviews</a></li>
+
+                        {# ADMIN ROLE #}
+                        {% elif user.is_superuser %}
+                            <li><a href="{% url 'studlist' %}">Students</a></li>
+                            <li><a href="{% url 'sponlist' %}">Sponsors</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">All Reviews</a></li>
+                        {% endif %}
+
+                        <li><a href="{% url 'logout_view' %}">Logout</a></li>
+
+                    {% else %}
+                        <li><a href="{% url 'studreg' %}">Student Register</a></li>
+                        <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
+                        <li><a href="{% url 'login_view' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard-header">
+            <div class="container">
+                <h1 class="dashboard-title">My Scholarships</h1>
+                <p>Manage and create scholarship opportunities for deserving students</p>
+                
+                <div class="dashboard-actions">
+                    <div>
+                        <p>Showing scholarships for <strong>{{ user.org_name }} Foundation</strong></p>
+                    </div>
+                    <a href="{% url 'addscholar' %}" class="add-scholarship-btn">
+                        <i class="fas fa-plus"></i> Create New Scholarship
+                    </a>
+                </div>
+            </div>
+        </section>
+
+<section class="scholarships-section">
+    <div class="container">
+        {% if scholarships %}
+        <div class="scholarships-grid">
+            {% for scholarship in scholarships %}
+            <div class="scholarship-card">
+                <!-- Scholarship Image -->
+                <div class="scholarship-image">
+                    {% if scholarship.image %}
+                    <img src="{{ scholarship.image.url }}" alt="{{ scholarship.name }}">
+                    {% else %}
+                    <div class="default-scholarship-image">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="scholarship-header">
+                    <h3 class="scholarship-title">{{ scholarship.name }}</h3>
+                    <div class="scholarship-amount">${{ scholarship.amount }}</div>
+                </div>
+                <div class="scholarship-body">
+                    <div class="scholarship-detail">
+                        <div class="detail-icon"><i class="fas fa-book-open"></i></div>
+                        <div>
+                            <strong>Field of Study:</strong> {{ scholarship.field }}
+                        </div>
+                    </div>
+                    <div class="scholarship-detail">
+                        <div class="detail-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <strong>Education Level:</strong> {{ scholarship.education_level }}
+                        </div>
+                    </div>
+                    <div class="scholarship-detail">
+                        <div class="detail-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div>
+                            <strong>Deadline:</strong> {{ scholarship.deadline|date:"F d, Y" }}
+                        </div>
+                    </div>
+                    <div class="scholarship-detail">
+                        <div class="detail-icon"><i class="fas fa-info-circle"></i></div>
+                        <div>
+                            {{ scholarship.description|truncatewords:20 }}
+                        </div>
+                    </div>
+                    <div class="scholarship-detail">
+                        <div class="detail-icon"><i class="fas fa-tags"></i></div>
+                        <div>
+                            <strong>Type:</strong> {{ scholarship.get_scholarship_type_display }}
+                        </div>
+                    </div>
+                </div>
+                <div class="scholarship-footer">
+                    <a href="{% url 'applicants_list' %}" class="btn btn-secondary">View Details</a>
+                    <span class="applicants-count">{{ scholarship.applicants }} applicant{{ scholarship.applicants|pluralize }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="scholarships-grid">
+            <div class="no-scholarships">
+                <div class="no-scholarships-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>No Scholarships Found</h3>
+                <p>You haven't created any scholarships yet. Get started by creating your first scholarship opportunity.</p>
+                <a href="{% url 'addscholar' %}" class="btn btn-primary" style="margin-top: 20px;">
+                    <i class="fas fa-plus"></i> Create Scholarship
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Copyright &copy; 2023 All Rights Reserved By ScholarAid</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/studdetails.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarAid - Student Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
+                <h1>ScholarAid</h1>
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About</a></li> 
+
+                    {% if user.is_authenticated %}
+
+                        {# STUDENT ROLE #}
+                        {% if user.role == "student" %}
+                            <li><a href="{% url 'registered_scholarships' %}">My Scholarship</a></li>
+                            <li><a href="{% url 'my_sponsors' %}">My Sponsor</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">Review</a></li>
+                            <li>
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
+                                    style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
+                            </li>
+
+                        {# SPONSOR ROLE #}
+                        {% elif user.role == "sponsor" %}
+                            <li><a href="{% url 'studlist' %}" class="active">Students</a></li>
+                            <li><a href="{% url 'ourscholar' %}">Our Scholarships</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">View Reviews</a></li>
+
+                        {# ADMIN ROLE #}
+                        {% elif user.is_superuser %}
+                            <li><a href="{% url 'studlist' %}" class="active">Students</a></li>
+                            <li><a href="{% url 'sponlist' %}">Sponsors</a></li>
+                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
+                            <li><a href="{% url 'review_page' %}">All Reviews</a></li>
+                        {% endif %}
+
+                        <li><a href="{% url 'logout_view' %}">Logout</a></li>
+
+                    {% else %}
+                        <li><a href="{% url 'studreg' %}">Student Register</a></li>
+                        <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
+                        <li><a href="{% url 'login_view' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="student-header">
+            <div class="container">
+                <div class="student-header-content">
+                    {% if student.photo %}
+                    <img src="{{ student.photo.url }}" class="student-avatar" alt="{{ student.name }}">
+                    {% else %}
+                    <div class="default-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    {% endif %}
+                    <div class="student-info">
+                        <h1>{{ student.username }}</h1>
+                        <p>Student Profile</p>
+                        <div class="student-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-id-card"></i>
+                                <span>ID: {{ student.id }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-school"></i>
+                                <span>{{ student.school }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Class {{ student.class_level }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Joined {{ student.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="student-details">
+            <div class="container">
+                <div class="details-container">
+                    <!-- Personal Information Card -->
+                    <div class="detail-card">
+                        <h2><i class="fas fa-user-circle"></i> Personal Information</h2>
+                        <div class="detail-row">
+                            <div class="detail-label">Full Name</div>
+                            <div class="detail-value">{{ student.username }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Date of Birth</div>
+                            <div class="detail-value">{{ student.date_joined|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Gender</div>
+                            <div class="detail-value">{{ student.get_gender_display }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Phone Number</div>
+                            <div class="detail-value">{{ student.phone }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">{{ student.email }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Academic Information Card -->
+                    <div class="detail-card">
+                        <h2><i class="fas fa-graduation-cap"></i> Academic Information</h2>
+                        <div class="detail-row">
+                            <div class="detail-label">School</div>
+                            <div class="detail-value">{{ student.school }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Class/Grade</div>
+                            <div class="detail-value">{{ student.student_class }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Field of Study</div>
+                            <div class="detail-value">{{ student.field_of_study|default:"Not specified" }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">GPA</div>
+                            <div class="detail-value">{{ student.gpa|default:"Not specified" }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Academic Achievements</div>
+                            <div class="detail-value">{{ student.achievements|default:"None recorded" }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Information Card -->
+                    <div class="detail-card">
+                        <h2><i class="fas fa-address-book"></i> Contact Information</h2>
+                        <div class="detail-row">
+                            <div class="detail-label">Address</div>
+                            <div class="detail-value">{{ student.address }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">District</div>
+                            <div class="detail-value">{{ student.district }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Place</div>
+                            <div class="detail-value">{{ student.place }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Guardian Name</div>
+                            <div class="detail-value">{{ student.guardian_name }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Guardian Contact</div>
+                            <div class="detail-value">{{ student.guardian_phone }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Financial Information Card -->
+                    <div class="detail-card">
+                        <h2><i class="fas fa-money-bill-wave"></i> Financial Information</h2>
+                        <div class="detail-row">
+                            <div class="detail-label">Financial Status</div>
+                            <div class="detail-value">{{ student.get_financial_status_display }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Family Income</div>
+                            <div class="detail-value">${{ student.family_income|default:"Not specified" }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Sponsorship Needed</div>
+                            <div class="detail-value">
+                                {% if student.needs_sponsorship %}
+                                <span style="color: var(--success-color);">Yes</span>
+                                {% else %}
+                                <span style="color: var(--secondary-color);">No</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Current Sponsors</div>
+                            <div class="detail-value">
+                                {% if student.sponsors.all %}
+                                    {% for sponsor in student.sponsors.all %}
+                                        {{ sponsor.organization_name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    None
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documents Section -->
+                <div class="detail-card documents-section">
+                    <h2><i class="fas fa-file-alt"></i> Documents</h2>
+                    
+                    {% if documents %}
+                        {% for document in documents %}
+                        <div class="document-card">
+                            <div class="document-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="document-info">
+                                <strong>{{ document.name }}</strong>
+                                <div style="font-size: 13px; color: var(--secondary-color);">
+                                    Uploaded {{ document.uploaded_at|date:"M d, Y" }}
+                                </div>
+                            </div>
+                            <div class="document-actions">
+                                <a href="{{ document.file.url }}" class="btn btn-secondary btn-sm" download>
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="text-align: center; color: var(--secondary-color); padding: 20px 0;">
+                            No documents uploaded yet
+                        </p>
+                    {% endif %}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="{% url 'studlist' %}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                    <form method="post" action="#" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this student?')">
+                            <i class="fas fa-trash"></i> Delete Student
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Copyright &copy; 2023 All Rights Reserved By ScholarAid</p>
+        </div>
+    </footer>
+</body>
+</html>
