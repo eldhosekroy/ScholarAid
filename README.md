@@ -27,3 +27,34 @@ ScholarAid is a Django-based platform designed to support underprivileged studen
 ```bash
 git clone https://github.com/yourusername/scholaraid.git
 cd scholaraid
+```
+
+### 2. 🌐 Create & Activate a Virtual Environment
+
+👉 On Linux/Mac:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+👉 On Windows:
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### 3. 📦 Install Required Packages
+```bash
+pip install -r requirements.txt
+```
+
+### 4. ⚙️ Setup Database
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 5. 🚀 Run the Development Server
+```bash
+python manage.py runserver
+```
