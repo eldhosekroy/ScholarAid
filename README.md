@@ -25,7 +25,7 @@ ScholarAid is a Django-based platform designed to support underprivileged studen
 ### 1. 🔁 Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/scholaraid.git
+git clone https://github.com/eldhosekroy/ScholarAid
 cd scholaraid
 ```
 
