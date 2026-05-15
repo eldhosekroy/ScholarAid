@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarAid - Edit Exam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, rgba(101,114,42,0.9) 0%, rgba(101,114,42,0.8) 100%);
+            color: white;
+            padding: 60px 0 40px;
+        }
+        
+        .exam-management {
+            padding: 50px 0;
+        }
+        
+        .exam-form {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+        }
+        
+        .option-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .option-input {
+            flex: 1;
+        }
+        
+        .correct-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
+                <h1>ScholarAid</h1>
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'examadmin' %}">Back to Management</a></li>
+                    <li><a href="{% url 'logout_view' %}">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="admin-header">
+            <div class="container">
+                <h1>Edit Exam: {{ exam.title }}</h1>
+                <p>Modify exam details and questions</p>
+            </div>
+        </section>
+
+        <section class="exam-management">
+            <div class="container">
+                <form class="exam-form" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="scholarship">Associated Scholarship *</label>
+                        <select id="scholarship" name="scholarship_id" required>
+                            <option value="">-- Select Scholarship --</option>
+                            {% for s in scholarships %}
+                            <option value="{{ s.id }}" {% if exam.scholarship.id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exam-title">Exam Title *</label>
+                        <input type="text" id="exam-title" name="title" value="{{ exam.title }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exam-description">Description</label>
+                        <textarea id="exam-description" name="description">{{ exam.description }}</textarea>
+                    </div>
+                    
+                    <div class="form-row" style="display: flex; gap: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exam-duration">Duration (minutes) *</label>
+                            <input type="number" id="exam-duration" name="duration" value="{{ exam.duration }}" required min="1">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exam-passing-score">Passing Score (%) *</label>
+                            <input type="number" id="exam-passing-score" name="passing_score" value="{{ exam.passing_score }}" required min="1" max="100">
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin: 30px 0 20px; color: var(--primary-color);">Questions</h3>
+                    
+                    <div id="questions-container">
+                        {% for question in exam.questions.all %}
+                        <div class="question-group" style="margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px dashed #ddd;">
+                            <div class="form-group">
+                                <label>Question {{ forloop.counter }} *</label>
+                                <textarea name="questions[{{ forloop.counter0 }}][text]" required>{{ question.text }}</textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Options *</label>
+                                {% for option in question.options.all %}
+                                <div class="option-row">
+                                    <div class="option-input">
+                                        <input type="text" name="questions[{{ forloop.parentloop.counter0 }}][options][{{ forloop.counter0 }}]" value="{{ option.text }}" required>
+                                    </div>
+                                    <div class="correct-option">
+                                        <input type="radio" name="questions[{{ forloop.parentloop.counter0 }}][correct]" value="{{ forloop.counter0 }}" {% if option.is_correct %}checked{% endif %} required>
+                                        <span>Correct</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline" onclick="addQuestion()">
+                        <i class="fas fa-plus"></i> Add Another Question
+                    </button>
+                    
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Exam
+                        </button>
+                        <a href="{% url 'examadmin' %}" class="btn btn-secondary" style="text-decoration: none; margin-left: 10px;">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let questionCount = parseInt("{{ exam.questions.count }}") || 0;
+        
+        function addQuestion() {
+            questionCount++;
+            const questionsContainer = document.getElementById('questions-container');
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-group';
+            newQuestion.style.marginBottom = '40px';
+            newQuestion.style.paddingBottom = '20px';
+            newQuestion.style.borderBottom = '1px dashed #ddd';
+            
+            newQuestion.innerHTML = `
+                <div class="form-group">
+                    <label>Question ${questionCount} *</label>
+                    <textarea name="questions[${questionCount-1}][text]" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Options *</label>
+                    <div class="option-row">
+                        <div class="option-input">
+                            <input type="text" name="questions[${questionCount-1}][options][0]" required>
+                        </div>
+                        <div class="correct-option">
+                            <input type="radio" name="questions[${questionCount-1}][correct]" value="0" required>
+                            <span>Correct</span>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-input">
+                            <input type="text" name="questions[${questionCount-1}][options][1]" required>
+                        </div>
+                        <div class="correct-option">
+                            <input type="radio" name="questions[${questionCount-1}][correct]" value="1">
+                            <span>Correct</span>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-input">
+                            <input type="text" name="questions[${questionCount-1}][options][2]" required>
+                        </div>
+                        <div class="correct-option">
+                            <input type="radio" name="questions[${questionCount-1}][correct]" value="2">
+                            <span>Correct</span>
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <div class="option-input">
+                            <input type="text" name="questions[${questionCount-1}][options][3]" required>
+                        </div>
+                        <div class="correct-option">
+                            <input type="radio" name="questions[${questionCount-1}][correct]" value="3">
+                            <span>Correct</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            questionsContainer.appendChild(newQuestion);
+            newQuestion.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
