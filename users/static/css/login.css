@@ -1,10 +1,12 @@
 /* Additional styles for login page */
 .login-section {
-  padding: 80px 0;
+  padding: 80px 15px;
   background-color: white;
-  min-height: calc(100vh - 160px);
+  min-height: calc(100vh - 200px);
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .login-container {

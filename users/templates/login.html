@@ -11,56 +11,7 @@
     
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
-                <h1>ScholarAid</h1>
-            </div>
-            <nav class="navbar">
-                <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'about' %}">About</a></li> 
-
-                    {% if user.is_authenticated %}
-
-                        {# STUDENT ROLE #}
-                        {% if user.role == "student" %}
-                            <li><a href="{% url 'registered_scholarships' %}">My Scholarship</a></li>
-                            <li><a href="{% url 'my_sponsors' %}">My Sponsor</a></li>
-                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
-                            <li><a href="{% url 'review_page' %}">Review</a></li>
-                            <li>
-                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
-                                    style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
-                            </li>
-
-                        {# SPONSOR ROLE #}
-                        {% elif user.role == "sponsor" %}
-                            <li><a href="{% url 'studlist' %}">Students</a></li>
-                            <li><a href="{% url 'ourscholar' %}">Our Scholarships</a></li>
-                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
-                            <li><a href="{% url 'review_page' %}">View Reviews</a></li>
-
-                        {# ADMIN ROLE #}
-                        {% elif user.is_superuser %}
-                            <li><a href="{% url 'studlist' %}">Students</a></li>
-                            <li><a href="{% url 'sponlist' %}">Sponsors</a></li>
-                            <li><a href="{% url 'allscholar' %}">All Scholarships</a></li>
-                            <li><a href="{% url 'review_page' %}">All Reviews</a></li>
-                        {% endif %}
-
-                        <li><a href="{% url 'logout_view' %}">Logout</a></li>
-
-                    {% else %}
-                        <li><a href="{% url 'studreg' %}">Student Register</a></li>
-                        <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
-                        <li><a href="{% url 'login_view' %}" class="active">Login</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+    {% include 'header.html' %}
 
     <main>
         <section class="login-section">

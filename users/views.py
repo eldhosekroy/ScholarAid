@@ -45,7 +45,7 @@ def studreg(request):
             student.password=make_password(password)
             student.role="student"
             student.save()
-            return redirect('login')  # Or student dashboard
+            return redirect('login_view')  # Or student dashboard
         else:
             print(form.errors)
     else:

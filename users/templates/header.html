@@ -1,51 +1,81 @@
 {% load static %}
+{% with request.resolver_match.url_name as current_url %}
 <header class="header">
     <div class="container">
         <div class="logo">
-            <img src="{% static 'images/logo.png' %}" alt="" style="width: 75px; height: 75px;">
-            <h1>ScholarAid</h1>
+            <a href="{% url 'home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="ScholarAid Logo">
+                <h1>ScholarAid</h1>
+            </a>
         </div>
         <nav class="navbar">
             <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'about' %}" class="active" >About</a></li> 
+                <li><a href="{% url 'home' %}" class="{% if current_url == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="{% url 'about' %}" class="{% if current_url == 'about' %}active{% endif %}">About</a></li> 
 
                 {% if user.is_authenticated %}
 
                     {# STUDENT ROLE #}
                     {% if user.role == "student" %}
-                        <li><a href="#">My Scholarship</a></li>
-                        <li><a href="#">My Sponsor</a></li>
-                        <li><a href="#">All Scholarships</a></li>
-                        <li><a href="#">Review</a></li>
-                        <li>
-                            <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo"
-                                 style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #f4f4f4;">
+                        <li><a href="{% url 'registered_scholarships' %}" class="{% if current_url == 'registered_scholarships' %}active{% endif %}">My Scholarships</a></li>
+                        <li><a href="{% url 'my_sponsors' %}" class="{% if current_url == 'my_sponsors' %}active{% endif %}">My Sponsors</a></li>
+                        <li><a href="{% url 'allscholar' %}" class="{% if current_url == 'allscholar' %}active{% endif %}">All Scholarships</a></li>
+                        <li><a href="{% url 'review_page' %}" class="{% if current_url == 'review_page' %}active{% endif %}">Reviews</a></li>
+                        <li class="profile-nav-item">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo">
+                            {% else %}
+                                <div class="default-profile-avatar">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
                         </li>
 
                     {# SPONSOR ROLE #}
                     {% elif user.role == "sponsor" %}
-                        <li><a href="#">Students</a></li>
-                        <li><a href="#">Our Scholarships</a></li>
-                        <li><a href="#">All Scholarships</a></li>
-                        <li><a href="#">View Reviews</a></li>
+                        <li><a href="{% url 'studlist' %}" class="{% if current_url == 'studlist' %}active{% endif %}">Students</a></li>
+                        <li><a href="{% url 'ourscholar' %}" class="{% if current_url == 'ourscholar' %}active{% endif %}">My Scholarships</a></li>
+                        <li><a href="{% url 'examadmin' %}" class="{% if current_url == 'examadmin' %}active{% endif %}">Exams</a></li>
+                        <li><a href="{% url 'allscholar' %}" class="{% if current_url == 'allscholar' %}active{% endif %}">All Scholarships</a></li>
+                        <li><a href="{% url 'review_page' %}" class="{% if current_url == 'review_page' %}active{% endif %}">Reviews</a></li>
+                        <li class="profile-nav-item">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo">
+                            {% else %}
+                                <div class="default-profile-avatar">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </li>
 
                     {# ADMIN ROLE #}
                     {% elif user.is_superuser %}
-                        <li><a href="{% url 'students_list' %}">Students</a></li>
-                        <li><a href="{% url 'sponsors_list' %}">Sponsors</a></li>
-                        <li><a href="{% url 'all_scholarships' %}">All Scholarships</a></li>
-                        <li><a href="{% url 'all_reviews' %}">All Reviews</a></li>
+                        <li><a href="{% url 'studlist' %}" class="{% if current_url == 'studlist' %}active{% endif %}">Students</a></li>
+                        <li><a href="{% url 'sponlist' %}" class="{% if current_url == 'sponlist' %}active{% endif %}">Sponsors</a></li>
+                        <li><a href="{% url 'examadmin' %}" class="{% if current_url == 'examadmin' %}active{% endif %}">Exams</a></li>
+                        <li><a href="{% url 'allscholar' %}" class="{% if current_url == 'allscholar' %}active{% endif %}">All Scholarships</a></li>
+                        <li><a href="{% url 'review_page' %}" class="{% if current_url == 'review_page' %}active{% endif %}">Reviews</a></li>
+                        <li class="profile-nav-item">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}" alt="Profile" class="profile-photo">
+                            {% else %}
+                                <div class="default-profile-avatar">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </li>
                     {% endif %}
 
-                    <li><a href="{% url 'logout_view' %}">Logout</a></li>
+                    <li><a href="{% url 'logout_view' %}" class="nav-logout-btn">Logout</a></li>
 
                 {% else %}
-                    <li><a href="{% url 'studreg' %}">Student Register</a></li>
-                    <li><a href="{% url 'sponreg' %}">Sponsor Register</a></li>
-                    <li><a href="{% url 'login_view' %}">Login</a></li>
+                    <li><a href="{% url 'studreg' %}" class="{% if current_url == 'studreg' %}active{% endif %}">Student Register</a></li>
+                    <li><a href="{% url 'sponreg' %}" class="{% if current_url == 'sponreg' %}active{% endif %}">Sponsor Register</a></li>
+                    <li><a href="{% url 'login_view' %}" class="nav-login-btn {% if current_url == 'login_view' %}active{% endif %}">Login</a></li>
                 {% endif %}
             </ul>
         </nav>
     </div>
 </header>
+{% endwith %}
+
